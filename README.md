@@ -9,3 +9,9 @@ The app renders a title and an unordered list of todos.
 ```bash
 npm install
 ```
+
+## Development
+
+```bash
+npm run dev
+```
