@@ -1,35 +1,22 @@
-import { useState } from "react"
+import { useRef } from "react"
 
-function TodoForm({ todoList, setTodoList }) {
-  const [title, setTitle] = useState("")
+function TodoForm({ onAddTodo }) {
+  const inputRef = useRef(null)
 
-  const handleSubmit = (event) => {
+  const handleAddTodo = (event) => {
     event.preventDefault()
 
-    const trimmedTitle = title.trim()
-    if (!trimmedTitle) {
-      return
-    }
+    const todoTitle = event.target.todoTitle.value.trim()
+    if (!todoTitle) return
 
-    const nextId =
-      todoList.length === 0
-        ? 1
-        : Math.max(...todoList.map((todo) => todo.id)) + 1
-
-    setTodoList([...todoList, { id: nextId, title: trimmedTitle }])
-    setTitle("")
+    onAddTodo(todoTitle)
+    event.target.reset()
+    inputRef.current.focus()
   }
-
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleAddTodo}>
       <label htmlFor="todoTitle">Todo</label>
-      <input
-        id="title"
-        name="title"
-        placeholder="Add a todo"
-        value={title}
-        onChange={(event) => setTitle(event.target.value)}
-      />
+      <input id="todoTitle" name="todoTitle" ref={inputRef} required />
       <button type="submit">Add Todo</button>
     </form>
   )
