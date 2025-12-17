@@ -12,7 +12,9 @@ function TodoForm({ todoList, setTodoList }) {
     }
 
     const nextId =
-      todoList.length === 0 ? 1 : Math.max(...todoList.map((todo) => todo.id)) + 1
+      todoList.length === 0
+        ? 1
+        : Math.max(...todoList.map((todo) => todo.id)) + 1
 
     setTodoList([...todoList, { id: nextId, title: trimmedTitle }])
     setTitle("")
@@ -20,7 +22,9 @@ function TodoForm({ todoList, setTodoList }) {
 
   return (
     <form onSubmit={handleSubmit}>
+      <label htmlFor="todoTitle">Todo</label>
       <input
+        id="title"
         name="title"
         placeholder="Add a todo"
         value={title}
