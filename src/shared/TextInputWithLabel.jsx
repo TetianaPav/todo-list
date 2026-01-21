@@ -9,11 +9,10 @@ function TextInputWithLabel({
     <>
       <label htmlFor={elementId}>{labelText}</label>
       <input
-        type="text"
-        id={elementId}
-        ref={inputRef}
-        value={value}
-        onChange={onChange}
+        type="checkbox"
+        checked={todo.isCompleted}
+        disabled={todo.isCompleted}
+        onChange={() => onCompleteTodo(todo.id)}
       />
     </>
   )
