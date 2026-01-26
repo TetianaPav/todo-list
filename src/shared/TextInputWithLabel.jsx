@@ -4,15 +4,17 @@ function TextInputWithLabel({
   onChange,
   inputRef,
   value,
+  type = "text",
 }) {
   return (
     <>
       <label htmlFor={elementId}>{labelText}</label>
       <input
-        type="checkbox"
-        checked={todo.isCompleted}
-        disabled={todo.isCompleted}
-        onChange={() => onCompleteTodo(todo.id)}
+        id={elementId}
+        type={type}
+        ref={inputRef}
+        value={value}
+        onChange={onChange}
       />
     </>
   )
