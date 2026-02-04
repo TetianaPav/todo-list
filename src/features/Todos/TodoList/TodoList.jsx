@@ -1,14 +1,12 @@
 import TodoListItem from "./TodoListItem.jsx"
 import { useMemo } from "react"
 
-function TodoList({ todoList, dataVersion, onCompleteTodo, onUpdateTodo }) {
+function TodoList({ todoList, onCompleteTodo, onUpdateTodo }) {
   const filteredTodoList = useMemo(() => {
-    console.log(`Recalculating filtered todos (v${dataVersion})`)
     return {
-      version: dataVersion,
       todos: todoList.filter((t) => !t.isCompleted),
     }
-  }, [todoList, dataVersion])
+  }, [todoList])
 
   return filteredTodoList.todos.length === 0 ? (
     <p>Add todo above to get started</p>
