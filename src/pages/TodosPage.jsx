@@ -1,10 +1,20 @@
 import { useEffect, useState } from "react"
-import TodoForm from "./TodoForm.jsx"
-import TodoList from "./TodoList/TodoList.jsx"
+import { useSearchParams } from "react-router"
+import { useAuth } from "../contexts/AuthContext"
+
+import StatusFilter from "../shared/StatusFilter"
+
+import TodoForm from "../features/Todos/TodoForm.jsx"
+import TodoList from "../features/Todos/TodoList/TodoList.jsx"
 
 const baseUrl = import.meta.env.VITE_BASE_URL
 
-function TodosPage({ token }) {
+function TodosPage() {
+  const { token } = useAuth()
+
+  const [searchParams] = useSearchParams()
+  const statusFilter = searchParams.get("status") || "all"
+
   const [todoList, setTodoList] = useState([])
   const [error, setError] = useState("")
   const [isTodoListLoading, setIsTodoListLoading] = useState(false)
@@ -16,7 +26,7 @@ function TodosPage({ token }) {
       try {
         setError("")
         setIsTodoListLoading(true)
-
+        //Get
         const response = await fetch(`${baseUrl}/tasks`, {
           method: "GET",
           headers: {
@@ -28,13 +38,12 @@ function TodosPage({ token }) {
         if (response.status === 401) {
           throw new Error("unauthorized")
         }
-
         if (!response.ok) {
           throw new Error(`request failed: ${response.status}`)
         }
 
         const data = await response.json()
-        setTodoList(data)
+        setTodoList(data.map((t) => ({ ...t, isSynced: true })))
       } catch (err) {
         setError(`Error: ${err.name} | ${err.message}`)
       } finally {
@@ -45,6 +54,7 @@ function TodosPage({ token }) {
     fetchTodos()
   }, [token])
 
+  //Add =========
   const addTodo = async (todoTitle) => {
     const tempId = Date.now()
 
@@ -52,13 +62,14 @@ function TodosPage({ token }) {
       id: tempId,
       title: todoTitle,
       isCompleted: false,
+      isSynced: false,
     }
 
     setTodoList((prev) => [tempTodo, ...prev])
 
     try {
       setError("")
-
+      //Post
       const response = await fetch(`${baseUrl}/tasks`, {
         method: "POST",
         headers: {
@@ -77,13 +88,18 @@ function TodosPage({ token }) {
 
       const savedTodo = await response.json()
 
-      setTodoList((prev) => prev.map((t) => (t.id === tempId ? savedTodo : t)))
+      setTodoList((prev) =>
+        prev.map((t) =>
+          t.id === tempId ? { ...savedTodo, isSynced: true } : t
+        )
+      )
     } catch (err) {
       setTodoList((prev) => prev.filter((t) => t.id !== tempId))
       setError(`Error: ${err.name} | ${err.message}`)
     }
   }
 
+  //Complete ==============
   const completeTodo = async (id) => {
     let originalTodo
 
@@ -94,9 +110,10 @@ function TodosPage({ token }) {
     })
     if (!originalTodo) return
 
-    if (!originalTodo.createdTime) {
+    if (originalTodo.isSynced === false) {
       setError("Error: todo not synced yet — try again in a second")
       setTodoList((prev) => prev.map((t) => (t.id === id ? originalTodo : t)))
+      return
       return
     }
 
@@ -124,6 +141,8 @@ function TodosPage({ token }) {
     }
   }
 
+  //Update ==========
+
   const updateTodo = async (editedTodo) => {
     const cleanedTitle = editedTodo.title.trim()
     if (!cleanedTitle) {
@@ -137,22 +156,21 @@ function TodosPage({ token }) {
       if (!originalTodo) return prev
 
       const merged = { ...originalTodo, ...editedTodo, title: cleanedTitle }
-      return prev.map((t) => (t.id === editedTodo.id ? editedTodo : t))
+      return prev.map((t) => (t.id === editedTodo.id ? merged : t))
     })
 
     if (!originalTodo) return
 
-    if (!originalTodo.createdTime) {
+    if (originalTodo.isSynced === false) {
       setError("Error: todo not synced yet — try again in a second")
-      setTodoList((prev) =>
-        prev.map((t) => (t.id === editedTodo.id ? originalTodo : t))
-      )
+      setTodoList((prev) => prev.map((t) => (t.id === id ? originalTodo : t)))
+      return
       return
     }
 
     try {
       setError("")
-
+      // Patch
       const response = await fetch(`${baseUrl}/tasks/${editedTodo.id}`, {
         method: "PATCH",
         headers: {
@@ -161,7 +179,7 @@ function TodosPage({ token }) {
         },
         credentials: "include",
         body: JSON.stringify({
-          title: editedTodo.title,
+          title: cleanedTitle,
           isCompleted: editedTodo.isCompleted,
           createdTime: originalTodo.createdTime,
         }),
@@ -177,6 +195,8 @@ function TodosPage({ token }) {
     }
   }
 
+  //return
+
   return (
     <div>
       {error && (
@@ -189,11 +209,16 @@ function TodosPage({ token }) {
       )}
 
       {isTodoListLoading && <p>Loading todos...</p>}
+
+      <StatusFilter />
+
       <TodoForm onAddTodo={addTodo} />
+
       <TodoList
         todoList={todoList}
         onCompleteTodo={completeTodo}
         onUpdateTodo={updateTodo}
+        statusFilter={statusFilter}
       />
     </div>
   )

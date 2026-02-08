@@ -5,6 +5,7 @@ import { isValidTodoTitle } from "../../../utils/todoValidation.js"
 function TodoListItem({ todo, onCompleteTodo, onUpdateTodo }) {
   const [isEditing, setIsEditing] = useState(false)
   const [workingTitle, setWorkingTitle] = useState(todo.title)
+  const isSyncing = todo.isSynced === false
 
   const handleCancel = () => {
     setWorkingTitle(todo.title)
@@ -50,17 +51,24 @@ function TodoListItem({ todo, onCompleteTodo, onUpdateTodo }) {
                 type="checkbox"
                 id={`checkbox${todo.id}`}
                 checked={todo.isCompleted}
+                disabled={isSyncing}
                 onChange={() => onCompleteTodo(todo.id)}
               />
             </label>
             <span
               onClick={() => {
+                if (isSyncing) return
                 setWorkingTitle(todo.title)
                 setIsEditing(true)
+              }}
+              style={{
+                opacity: isSyncing ? 0.6 : 1,
+                cursor: isSyncing ? "not-allowed" : "pointer",
               }}
             >
               {todo.title}
             </span>
+            {isSyncing ? <small> syncing…</small> : null}
           </>
         )}
       </form>
