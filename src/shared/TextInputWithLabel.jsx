@@ -11,10 +11,11 @@ function TextInputWithLabel({
       <label htmlFor={elementId}>{labelText}</label>
       <input
         id={elementId}
+        name={elementId}
         type={type}
-        ref={inputRef}
-        value={value}
+        value={value ?? ""}
         onChange={onChange}
+        ref={inputRef}
       />
     </>
   )

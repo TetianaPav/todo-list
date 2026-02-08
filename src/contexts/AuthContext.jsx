@@ -1,33 +1,31 @@
-import { createContext, useContext, useMemo, useState } from "react"
+import { createContext, useContext, useState } from "react"
+
+const AuthContext = createContext()
 
 const baseUrl = import.meta.env.VITE_BASE_URL
 
-const AuthContext = createContext(null)
-
-export function useAuth() {
-  const ctx = useContext(AuthContext)
-  if (!ctx) throw new Error("useAuth must be used within an AuthProvider")
-  return ctx
-}
-
 export function AuthProvider({ children }) {
-  const [email, setEmail] = useState("")
   const [token, setToken] = useState("")
+  const [user, setUser] = useState(null)
 
-  //Login
-  const login = async (userEmail, password) => {
+  const isAuthenticated = !!token
+
+  async function login(email, password) {
     try {
+      if (!email || !password) {
+        return { success: false, error: "Missing credentials" }
+      }
       const response = await fetch(`${baseUrl}/user/logon`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ email: userEmail, password }),
+        body: JSON.stringify({ email, password }),
       })
 
-      const data = await response.json()
+      const data = await response.json().catch(() => ({}))
 
-      if (response.ok && data?.name && data?.csrfToken) {
-        setEmail(data.name)
+      if (response.status === 200 && data?.name && data?.csrfToken) {
+        setUser({ name: data.name })
         setToken(data.csrfToken)
         return { success: true }
       }
@@ -36,45 +34,34 @@ export function AuthProvider({ children }) {
         success: false,
         error: `Authentication failed: ${data?.message || "Unknown error"}`,
       }
-    } catch (error) {
-      return {
-        success: false,
-        error: `Error: ${error.name} | ${error.message}`,
-      }
+    } catch (err) {
+      return { success: false, error: err.message }
     }
   }
 
-  //Logout
-  const logout = async () => {
+  async function logout() {
     try {
       await fetch(`${baseUrl}/user/logoff`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRF-TOKEN": token,
-        },
+        headers: token ? { "X-CSRF-TOKEN": token } : {},
         credentials: "include",
-      })
-    } catch (error) {
-      console.log("Logout request failed:", error)
+      }).catch(() => {})
     } finally {
-      setEmail("")
       setToken("")
+      setUser(null)
     }
-
     return { success: true }
   }
 
-  const value = useMemo(
-    () => ({
-      email,
-      token,
-      isAuthenticated: !!token,
-      login,
-      logout,
-    }),
-    [email, token]
+  return (
+    <AuthContext.Provider
+      value={{ token, user, isAuthenticated, login, logout }}
+    >
+      {children}
+    </AuthContext.Provider>
   )
+}
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+export function useAuth() {
+  return useContext(AuthContext)
 }
