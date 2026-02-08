@@ -3,7 +3,6 @@ import { useSearchParams } from "react-router"
 import { useAuth } from "../contexts/AuthContext"
 
 import StatusFilter from "../shared/StatusFilter"
-
 import TodoForm from "../features/Todos/TodoForm.jsx"
 import TodoList from "../features/Todos/TodoList/TodoList.jsx"
 
@@ -46,8 +45,6 @@ function TodosPage() {
         setTodoList(data.map((t) => ({ ...t, isSynced: true })))
       } catch (err) {
         setError(`Error: ${err.name} | ${err.message}`)
-      } finally {
-        setIsTodoListLoading(false)
       }
     }
 
@@ -57,10 +54,12 @@ function TodosPage() {
   //Add =========
   const addTodo = async (todoTitle) => {
     const tempId = Date.now()
+    const cleanedTitle = todoTitle.trim()
+    if (!cleanedTitle) return
 
     const tempTodo = {
       id: tempId,
-      title: todoTitle,
+      title: cleanedTitle,
       isCompleted: false,
       isSynced: false,
     }
@@ -69,7 +68,7 @@ function TodosPage() {
 
     try {
       setError("")
-      //Post
+
       const response = await fetch(`${baseUrl}/tasks`, {
         method: "POST",
         headers: {
@@ -78,7 +77,7 @@ function TodosPage() {
         },
         credentials: "include",
         body: JSON.stringify({
-          title: todoTitle,
+          title: cleanedTitle,
           isCompleted: false,
         }),
       })
@@ -99,27 +98,24 @@ function TodosPage() {
     }
   }
 
-  //Complete ==============
+  //COMPLETE
+  //======================
   const completeTodo = async (id) => {
-    let originalTodo
-
-    setTodoList((prev) => {
-      originalTodo = prev.find((t) => t.id === id)
-      if (!originalTodo) return prev
-      return prev.map((t) => (t.id === id ? { ...t, isCompleted: true } : t))
-    })
+    const originalTodo = todoList.find((t) => t.id === id)
     if (!originalTodo) return
 
     if (originalTodo.isSynced === false) {
       setError("Error: todo not synced yet — try again in a second")
-      setTodoList((prev) => prev.map((t) => (t.id === id ? originalTodo : t)))
-      return
       return
     }
 
+    setTodoList((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, isCompleted: true } : t))
+    )
+
     try {
       setError("")
-
+      //PATCH
       const response = await fetch(`${baseUrl}/tasks/${id}`, {
         method: "PATCH",
         headers: {
@@ -149,24 +145,20 @@ function TodosPage() {
       setError("Error: title cannot be empty")
       return
     }
-    let originalTodo
 
-    setTodoList((prev) => {
-      originalTodo = prev.find((t) => t.id === editedTodo.id)
-      if (!originalTodo) return prev
-
-      const merged = { ...originalTodo, ...editedTodo, title: cleanedTitle }
-      return prev.map((t) => (t.id === editedTodo.id ? merged : t))
-    })
-
+    const originalTodo = todoList.find((t) => t.id === editedTodo.id)
     if (!originalTodo) return
 
     if (originalTodo.isSynced === false) {
       setError("Error: todo not synced yet — try again in a second")
-      setTodoList((prev) => prev.map((t) => (t.id === id ? originalTodo : t)))
-      return
       return
     }
+
+    setTodoList((prev) =>
+      prev.map((t) =>
+        t.id === editedTodo.id ? { ...t, title: cleanedTitle } : t
+      )
+    )
 
     try {
       setError("")
@@ -223,5 +215,4 @@ function TodosPage() {
     </div>
   )
 }
-
 export default TodosPage
