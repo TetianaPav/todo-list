@@ -1,0 +1,32 @@
+.nav {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.navLink {
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 90%, transparent);
+  color: var(--text);
+  font-size: 13px;
+  transition: transform 120ms ease, background 120ms ease;
+}
+
+.navLink:hover {
+  transform: translateY(-1px);
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+}
+
+.active {
+  border-color: color-mix(in srgb, var(--primary) 60%, var(--border));
+  background: color-mix(in srgb, var(--primary) 22%, var(--surface));
+  font-weight: 600;
+}
+
+.navLink:focus-visible {
+  outline: none;
+  box-shadow: var(--focus);
+}

@@ -3,18 +3,33 @@ function TextInputWithLabel({
   labelText,
   onChange,
   inputRef,
-  value,
+  value = "",
+  type = "text",
+  placeholder = "",
+  maxLength,
+  required = false,
+  name,
+  ariaDescribedBy,
+  ariaInvalid = false,
 }) {
   return (
-    <>
+    <div>
       <label htmlFor={elementId}>{labelText}</label>
       <input
-        type="checkbox"
-        checked={todo.isCompleted}
-        disabled={todo.isCompleted}
-        onChange={() => onCompleteTodo(todo.id)}
+        id={elementId}
+        name={name ?? elementId}
+        value={value ?? ""}
+        ref={inputRef}
+        type={type}
+        onChange={onChange}
+        placeholder={placeholder}
+        maxLength={maxLength}
+        required={required}
+        autoComplete="off"
+        aria-describedby={ariaDescribedBy}
+        aria-invalid={ariaInvalid}
       />
-    </>
+    </div>
   )
 }
 

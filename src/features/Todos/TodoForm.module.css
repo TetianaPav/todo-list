@@ -1,0 +1,89 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.inputWrap {
+  flex: 1;
+}
+
+/* Style label + input inside TextInputWithLabel */
+.form :global(label) {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.form :global(input) {
+  width: 100%;
+  height: 44px; /* touch-friendly */
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.form :global(input::placeholder) {
+  color: color-mix(in srgb, var(--muted) 80%, transparent);
+}
+
+.form :global(input:focus-visible) {
+  outline: none;
+  box-shadow: var(--focus);
+}
+
+.button {
+  height: 44px; /* touch-friendly */
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--primary) 55%, var(--border));
+  background: color-mix(in srgb, var(--primary) 28%, var(--surface));
+  color: var(--text);
+  cursor: pointer;
+  transition: transform 120ms ease, background 120ms ease;
+}
+
+.button:hover {
+  transform: translateY(-1px);
+  background: color-mix(in srgb, var(--primary) 36%, var(--surface));
+}
+
+.button:active {
+  transform: translateY(0);
+}
+
+.button:focus-visible {
+  outline: none;
+  box-shadow: var(--focus);
+}
+
+.button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.error {
+  min-height: 18px; /* prevents layout jump */
+  color: var(--danger);
+  font-size: 13px;
+  margin: 0;
+}
+
+/* Mobile: stack input + button */
+@media (max-width: 520px) {
+  .row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

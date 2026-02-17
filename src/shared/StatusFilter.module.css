@@ -1,0 +1,50 @@
+.wrap {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.button {
+  height: 36px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 90%, transparent);
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+  transition: transform 120ms ease, background 120ms ease,
+    border-color 120ms ease;
+}
+
+.button:hover {
+  transform: translateY(-1px);
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+}
+
+.button:active {
+  transform: translateY(0);
+}
+
+/* Active state */
+.button[aria-pressed="true"] {
+  border-color: color-mix(in srgb, var(--primary) 60%, var(--border));
+  background: color-mix(in srgb, var(--primary) 22%, var(--surface));
+  color: var(--text);
+  font-weight: 600;
+}
+
+.button:focus-visible {
+  outline: none;
+  box-shadow: var(--focus);
+}
+
+/* Mobile: buttons fill row nicely */
+@media (max-width: 520px) {
+  .button {
+    flex: 1;
+    text-align: center;
+  }
+}

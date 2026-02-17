@@ -1,0 +1,86 @@
+/* ===== DARK THEME (default) ===== */
+:root {
+  /* Background */
+  --bg: #0b0c0f; /* near-black but soft */
+
+  /* Cards / surfaces */
+  --surface: #15171c; /* soft charcoal */
+
+  /* Text */
+  --text: #e6e7eb; /* soft white */
+  --muted: #9aa0a6; /* neutral gray */
+
+  /* Accent (subtle, not bright) */
+  --primary: #4c8bf5; /* soft Apple-like blue */
+
+  /* Danger */
+  --danger: #ff5c5c;
+
+  /* Borders (very subtle) */
+  --border: rgba(255, 255, 255, 0.06);
+
+  --radius: 14px;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --gap: 12px;
+  --max: 980px;
+
+  /* Focus ring */
+  --focus: 0 0 0 3px rgba(76, 139, 245, 0.35);
+}
+
+/* ===== LIGHT THEME ===== */
+[data-theme="light"] {
+  /* Background */
+  --bg: #f2f2f4; /* Apple light gray */
+
+  /* Cards */
+  --surface: #ffffff;
+
+  /* Text */
+  --text: #1c1c1e; /* Apple dark text */
+  --muted: #6e6e73;
+
+  /* Accent */
+  --primary: #2f6df6;
+
+  /* Danger */
+  --danger: #d93030;
+
+  /* Borders */
+  --border: rgba(0, 0, 0, 0.06);
+
+  --shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+
+  /* Focus */
+  --focus: 0 0 0 3px rgba(47, 109, 246, 0.25);
+}
+
+/* =========================================================
+   GLOBAL RESET / BASE
+   ========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus);
+}

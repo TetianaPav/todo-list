@@ -1,0 +1,50 @@
+/* ===== GLOBAL ELEMENT BASE ===== */
+
+/* Remove default button/input font inconsistencies */
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+/* Better image behavior */
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* Remove default list padding */
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Improve text rendering */
+body {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Prevent layout overflow issues */
+#root {
+  min-height: 100%;
+}
+
+/* Smooth hover for interactive elements */
+button,
+a {
+  transition: background 120ms ease, color 120ms ease, transform 120ms ease;
+}
+
+/* Disabled state clarity */
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

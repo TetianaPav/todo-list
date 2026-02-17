@@ -1,4 +1,5 @@
-import { useState } from "react"
+import { useState, useMemo } from "react"
+import styles from "./Logon.module.css"
 
 const baseUrl = import.meta.env.VITE_BASE_URL
 
@@ -7,6 +8,10 @@ function Logon({ onSetEmail, onSetToken }) {
   const [password, setPassword] = useState("")
   const [authError, setAuthError] = useState("")
   const [isLoggingOn, setIsLoggingOn] = useState(false)
+
+  const cleanedEmail = useMemo(() => email.trim(), [email])
+  const canSubmit =
+    cleanedEmail.length > 0 && password.length > 0 && !isLoggingOn
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -18,52 +23,80 @@ function Logon({ onSetEmail, onSetToken }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: cleanedEmail, password }),
       })
 
-      const data = await response.json()
+      const data = await response.json().catch(() => ({}))
 
-      if (response.status === 200 && data.name && data.csrfToken) {
-        onSetEmail(data.name)
+      if (response.ok && data?.csrfToken) {
+        onSetEmail(cleanedEmail)
         onSetToken(data.csrfToken)
       } else {
-        setAuthError(
-          `Authentication failed: ${data?.message || "Unknown error"}`
-        )
+        setAuthError("Login failed. Check your email/password and try again.")
       }
-    } catch (error) {
-      setAuthError(`Error: ${error.name} | ${error.message}`)
+    } catch {
+      setAuthError("Network error. Please try again.")
     } finally {
       setIsLoggingOn(false)
     }
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      {authError && <p>{authError}</p>}
+    <div className={styles.page}>
+      <form
+        onSubmit={handleSubmit}
+        className={styles.card}
+        aria-describedby="authError"
+      >
+        <h2 className={styles.title}>Log in</h2>
+        <p className={styles.subtitle}>
+          Use your test account to access your todos.
+        </p>
 
-      <label htmlFor="email">Email</label>
-      <input
-        id="email"
-        type="email"
-        required
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
+        <p
+          id="authError"
+          className={styles.error}
+          role="alert"
+          aria-live="polite"
+        >
+          {authError}
+        </p>
 
-      <label htmlFor="password">Password</label>
-      <input
-        id="password"
-        type="password"
-        required
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
+        <div className={styles.field}>
+          <label htmlFor="email" className={styles.label}>
+            Email
+          </label>
+          <input
+            id="email"
+            className={styles.input}
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="username"
+          />
+        </div>
 
-      <button type="submit" disabled={isLoggingOn}>
-        {isLoggingOn ? "Logging in..." : "Log On"}
-      </button>
-    </form>
+        <div className={styles.field}>
+          <label htmlFor="password" className={styles.label}>
+            Password
+          </label>
+          <input
+            id="password"
+            className={styles.input}
+            type="password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
+          />
+        </div>
+
+        <button type="submit" className={styles.button} disabled={!canSubmit}>
+          {isLoggingOn ? "Logging in..." : "Log in"}
+        </button>
+      </form>
+    </div>
   )
 }
 
